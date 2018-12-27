@@ -1,0 +1,10 @@
+src/*.o 
+src/*.d 
+src/*.elf 
+src/*.bin 
+src/*.hex 
+src/*.srec 
+src/*.list 
+src/*.map
+
+.DS_Store
