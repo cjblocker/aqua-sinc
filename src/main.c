@@ -141,7 +141,7 @@ static void gpio_setup(void)
   	gpio_set_af(GPIOC, GPIO_AF3, GPIO9);
 }
 
-static void tim_setup(void)
+static void tim_setup_01(void)
 {
 	/* Reset TIM1 peripheral. */
 	timer_reset(TIM1);
@@ -184,6 +184,50 @@ static void tim_setup(void)
 	/* Set the capture compare value for OC1 to max value -1 for max duty cycle/brightness. */
 	timer_set_oc_value(TIM1, TIM_OC1, 0xFFFF/2);
 	timer_enable_oc_output(TIM1, TIM_OC1);
+
+
+	/* -- OC2 configuration -- */
+	/* Configure global mode of line 2. */
+	timer_disable_oc_clear(TIM1, TIM_OC2);
+	timer_enable_oc_preload(TIM1, TIM_OC2);
+	timer_set_oc_slow_mode(TIM1, TIM_OC2);
+	timer_set_oc_mode(TIM1, TIM_OC2, TIM_OCM_PWM1);
+	timer_set_oc_polarity_high(TIM1, TIM_OC2);
+	timer_set_oc_idle_state_set(TIM1, TIM_OC2);
+	/* Set the capture compare value for OC2 to max value -1 for max duty cycle/brightness. */
+	timer_set_oc_value(TIM1, TIM_OC2, 0xFFFF/2);
+	timer_enable_oc_output(TIM1, TIM_OC2);
+
+
+	/* -- OC3 configuration -- */
+	/* Configure global mode of line 3. */
+	timer_disable_oc_clear(TIM1, TIM_OC3);
+	timer_enable_oc_preload(TIM1, TIM_OC3);
+	timer_set_oc_slow_mode(TIM1, TIM_OC3);
+	timer_set_oc_mode(TIM1, TIM_OC3, TIM_OCM_PWM1);
+	timer_set_oc_polarity_high(TIM1, TIM_OC3);
+	timer_set_oc_idle_state_set(TIM1, TIM_OC3);
+	/* Set the capture compare value for OC3 to max value -1 for max duty cycle/brightness. */
+	timer_set_oc_value(TIM1, TIM_OC3, 0xFFFF/2);
+	timer_enable_oc_output(TIM1, TIM_OC3);
+
+
+	/* -- OC4 configuration -- */
+	/* Configure global mode of line 4. */
+	timer_disable_oc_clear(TIM1, TIM_OC4);
+	timer_enable_oc_preload(TIM1, TIM_OC4);
+	timer_set_oc_slow_mode(TIM1, TIM_OC4);
+	timer_set_oc_mode(TIM1, TIM_OC4, TIM_OCM_PWM1);
+	timer_set_oc_polarity_high(TIM1, TIM_OC4);
+	timer_set_oc_idle_state_set(TIM1, TIM_OC4);
+	/* Set the capture compare value for OC4 to max value -1 for max duty cycle/brightness. */
+	timer_set_oc_value(TIM1, TIM_OC4, 0xFFFF/2);
+	timer_enable_oc_output(TIM1, TIM_OC4);
+
+
+
+
+
 	timer_enable_preload(TIM1);
 	timer_enable_break_main_output(TIM1);
 	/* Counter enable. */
@@ -191,7 +235,230 @@ static void tim_setup(void)
 
 }
 
-static void tim_setup_1(void)
+
+static void tim_setup_02(void)
+{
+	/* Reset TIM2 peripheral. */
+	timer_reset(TIM2);
+	/* Timer global mode:
+	* - No divider
+	* - Alignment edge
+	* - Direction up
+	*/
+	timer_set_mode(TIM2, TIM_CR1_CKD_CK_INT, TIM_CR1_CMS_EDGE, TIM_CR1_DIR_UP);
+	timer_set_prescaler(TIM2, 0);
+	timer_set_repetition_counter(TIM2, 0);
+	/* Enable preload. */
+	timer_disable_preload(TIM2);
+	/* Continous mode. */
+	timer_continuous_mode(TIM2);
+	/* Period (36kHz). */
+	timer_set_period(TIM2, 0xFFFF);
+	/* Disable outputs. */
+	timer_disable_oc_output(TIM2, TIM_OC1);
+	timer_disable_oc_output(TIM2, TIM_OC2);
+	timer_disable_oc_output(TIM2, TIM_OC3);
+	timer_disable_oc_output(TIM2, TIM_OC4);
+
+	timer_set_deadtime(TIM2, 0);
+	timer_set_enabled_off_state_in_idle_mode(TIM2);
+	timer_set_enabled_off_state_in_run_mode(TIM2);
+	timer_disable_break(TIM2);
+	timer_set_break_polarity_high(TIM2);
+	timer_disable_break_automatic_output(TIM2);
+	timer_set_break_lock(TIM2, TIM_BDTR_LOCK_OFF);
+
+
+	/* -- OC3 configuration -- */
+	/* Configure global mode of line 3. */
+	timer_disable_oc_clear(TIM2, TIM_OC3);
+	timer_enable_oc_preload(TIM2, TIM_OC3);
+	timer_set_oc_slow_mode(TIM2, TIM_OC3);
+	timer_set_oc_mode(TIM2, TIM_OC3, TIM_OCM_PWM1);
+	timer_set_oc_polarity_high(TIM2, TIM_OC3);
+	timer_set_oc_idle_state_set(TIM2, TIM_OC3);
+	/* Set the capture compare value for OC3 to max value -1 for max duty cycle/brightness. */
+	timer_set_oc_value(TIM2, TIM_OC3, 0xFFFF/2);
+	timer_enable_oc_output(TIM2, TIM_OC3);
+
+
+	/* -- OC4 configuration -- */
+	/* Configure global mode of line 4. */
+	timer_disable_oc_clear(TIM2, TIM_OC4);
+	timer_enable_oc_preload(TIM2, TIM_OC4);
+	timer_set_oc_slow_mode(TIM2, TIM_OC4);
+	timer_set_oc_mode(TIM2, TIM_OC4, TIM_OCM_PWM1);
+	timer_set_oc_polarity_high(TIM2, TIM_OC4);
+	timer_set_oc_idle_state_set(TIM2, TIM_OC4);
+	/* Set the capture compare value for OC4 to max value -1 for max duty cycle/brightness. */
+	timer_set_oc_value(TIM2, TIM_OC4, 0xFFFF/2);
+	timer_enable_oc_output(TIM2, TIM_OC4);
+
+
+
+	timer_enable_preload(TIM2);
+	timer_enable_break_main_output(TIM2);
+	/* Counter enable. */
+	timer_enable_counter(TIM2);
+
+}
+
+
+static void tim_setup_03(void)
+{
+	/* Reset TIM3 peripheral. */
+	timer_reset(TIM3);
+	/* Timer global mode:
+	* - No divider
+	* - Alignment edge
+	* - Direction up
+	*/
+	timer_set_mode(TIM3, TIM_CR1_CKD_CK_INT, TIM_CR1_CMS_EDGE, TIM_CR1_DIR_UP);
+	timer_set_prescaler(TIM3, 0);
+	timer_set_repetition_counter(TIM3, 0);
+	/* Enable preload. */
+	timer_disable_preload(TIM3);
+	/* Continous mode. */
+	timer_continuous_mode(TIM3);
+	/* Period (36kHz). */
+	timer_set_period(TIM3, 0xFFFF);
+	/* Disable outputs. */
+	timer_disable_oc_output(TIM3, TIM_OC1);
+	timer_disable_oc_output(TIM3, TIM_OC2);
+	timer_disable_oc_output(TIM3, TIM_OC3);
+	timer_disable_oc_output(TIM3, TIM_OC4);
+
+	timer_set_deadtime(TIM3, 0);
+	timer_set_enabled_off_state_in_idle_mode(TIM3);
+	timer_set_enabled_off_state_in_run_mode(TIM3);
+	timer_disable_break(TIM3);
+	timer_set_break_polarity_high(TIM3);
+	timer_disable_break_automatic_output(TIM3);
+	timer_set_break_lock(TIM3, TIM_BDTR_LOCK_OFF);
+
+	/* -- OC1 configuration -- */
+	/* Configure global mode of line 1. */
+	timer_disable_oc_clear(TIM3, TIM_OC1);
+	timer_enable_oc_preload(TIM3, TIM_OC1);
+	timer_set_oc_slow_mode(TIM3, TIM_OC1);
+	timer_set_oc_mode(TIM3, TIM_OC1, TIM_OCM_PWM1);
+	timer_set_oc_polarity_high(TIM3, TIM_OC1);
+	timer_set_oc_idle_state_set(TIM3, TIM_OC1);
+	/* Set the capture compare value for OC1 to max value -1 for max duty cycle/brightness. */
+	timer_set_oc_value(TIM3, TIM_OC1, 0xFFFF/2);
+	timer_enable_oc_output(TIM3, TIM_OC1);
+
+
+	/* -- OC2 configuration -- */
+	/* Configure global mode of line 2. */
+	timer_disable_oc_clear(TIM3, TIM_OC2);
+	timer_enable_oc_preload(TIM3, TIM_OC2);
+	timer_set_oc_slow_mode(TIM3, TIM_OC2);
+	timer_set_oc_mode(TIM3, TIM_OC2, TIM_OCM_PWM1);
+	timer_set_oc_polarity_high(TIM3, TIM_OC2);
+	timer_set_oc_idle_state_set(TIM3, TIM_OC2);
+	/* Set the capture compare value for OC2 to max value -1 for max duty cycle/brightness. */
+	timer_set_oc_value(TIM3, TIM_OC2, 0xFFFF/2);
+	timer_enable_oc_output(TIM3, TIM_OC2);
+
+
+
+	timer_enable_preload(TIM3);
+	timer_enable_break_main_output(TIM3);
+	/* Counter enable. */
+	timer_enable_counter(TIM3);
+
+}
+
+static void tim_setup_04(void)
+{
+	/* Reset TIM1 peripheral. */
+	timer_reset(TIM4);
+	/* Timer global mode:
+	* - No divider
+	* - Alignment edge
+	* - Direction up
+	*/
+	timer_set_mode(TIM4, TIM_CR1_CKD_CK_INT, TIM_CR1_CMS_EDGE, TIM_CR1_DIR_UP);
+	timer_set_prescaler(TIM4, 0);
+	timer_set_repetition_counter(TIM4, 0);
+	/* Enable preload. */
+	timer_disable_preload(TIM4);
+	/* Continous mode. */
+	timer_continuous_mode(TIM4);
+	/* Period (36kHz). */
+	timer_set_period(TIM4, 0xFFFF);
+	/* Disable outputs. */
+	timer_disable_oc_output(TIM4, TIM_OC1);
+	timer_disable_oc_output(TIM4, TIM_OC2);
+	timer_disable_oc_output(TIM4, TIM_OC3);
+	timer_disable_oc_output(TIM4, TIM_OC4);
+
+	timer_set_deadtime(TIM4, 0);
+	timer_set_enabled_off_state_in_idle_mode(TIM4);
+	timer_set_enabled_off_state_in_run_mode(TIM4);
+	timer_disable_break(TIM4);
+	timer_set_break_polarity_high(TIM4);
+	timer_disable_break_automatic_output(TIM4);
+	timer_set_break_lock(TIM4, TIM_BDTR_LOCK_OFF);
+
+	/* -- OC1 configuration -- */
+	/* Configure global mode of line 1. */
+	timer_disable_oc_clear(TIM4, TIM_OC1);
+	timer_enable_oc_preload(TIM4, TIM_OC1);
+	timer_set_oc_slow_mode(TIM4, TIM_OC1);
+	timer_set_oc_mode(TIM4, TIM_OC1, TIM_OCM_PWM1);
+	timer_set_oc_polarity_high(TIM4, TIM_OC1);
+	timer_set_oc_idle_state_set(TIM4, TIM_OC1);
+	/* Set the capture compare value for OC1 to max value -1 for max duty cycle/brightness. */
+	timer_set_oc_value(TIM4, TIM_OC1, 0xFFFF/2);
+	timer_enable_oc_output(TIM4, TIM_OC1);
+
+	/* -- OC2 configuration -- */
+	/* Configure global mode of line 2. */
+	timer_disable_oc_clear(TIM4, TIM_OC2);
+	timer_enable_oc_preload(TIM4, TIM_OC2);
+	timer_set_oc_slow_mode(TIM4, TIM_OC2);
+	timer_set_oc_mode(TIM4, TIM_OC2, TIM_OCM_PWM1);
+	timer_set_oc_polarity_high(TIM4, TIM_OC2);
+	timer_set_oc_idle_state_set(TIM4, TIM_OC2);
+	/* Set the capture compare value for OC2 to max value -1 for max duty cycle/brightness. */
+	timer_set_oc_value(TIM4, TIM_OC2, 0xFFFF/2);
+	timer_enable_oc_output(TIM4, TIM_OC2);
+
+	/* -- OC3 configuration -- */
+	/* Configure global mode of line 3. */
+	timer_disable_oc_clear(TIM4, TIM_OC3);
+	timer_enable_oc_preload(TIM4, TIM_OC3);
+	timer_set_oc_slow_mode(TIM4, TIM_OC3);
+	timer_set_oc_mode(TIM4, TIM_OC3, TIM_OCM_PWM1);
+	timer_set_oc_polarity_high(TIM4, TIM_OC3);
+	timer_set_oc_idle_state_set(TIM4, TIM_OC3);
+	/* Set the capture compare value for OC3 to max value -1 for max duty cycle/brightness. */
+	timer_set_oc_value(TIM4, TIM_OC3, 0xFFFF/2);
+	timer_enable_oc_output(TIM4, TIM_OC3);
+
+	/* -- OC4 configuration -- */
+	/* Configure global mode of line 4. */
+	timer_disable_oc_clear(TIM4, TIM_OC4);
+	timer_enable_oc_preload(TIM4, TIM_OC4);
+	timer_set_oc_slow_mode(TIM4, TIM_OC4);
+	timer_set_oc_mode(TIM4, TIM_OC4, TIM_OCM_PWM1);
+	timer_set_oc_polarity_high(TIM4, TIM_OC4);
+	timer_set_oc_idle_state_set(TIM4, TIM_OC4);
+	/* Set the capture compare value for OC4 to max value -1 for max duty cycle/brightness. */
+	timer_set_oc_value(TIM4, TIM_OC4, 0xFFFF/2);
+	timer_enable_oc_output(TIM4, TIM_OC4);
+
+
+	timer_enable_preload(TIM4);
+	timer_enable_break_main_output(TIM4);
+	/* Counter enable. */
+	timer_enable_counter(TIM4);
+
+}
+
+static void tim_setup_08(void)
 {
 	/* Reset TIM1 peripheral. */
 	timer_reset(TIM8);
@@ -235,6 +502,8 @@ static void tim_setup_1(void)
 	timer_set_oc_value(TIM8, TIM_OC1, 0xFFFF/2);
 	timer_enable_oc_output(TIM8, TIM_OC1);
 
+	/* -- OC2 configuration -- */
+	/* Configure global mode of line 2. */
 	timer_disable_oc_clear(TIM8, TIM_OC2);
 	timer_enable_oc_preload(TIM8, TIM_OC2);
 	timer_set_oc_slow_mode(TIM8, TIM_OC2);
@@ -245,6 +514,30 @@ static void tim_setup_1(void)
 	timer_set_oc_value(TIM8, TIM_OC2, 0xFFFF/2);
 	timer_enable_oc_output(TIM8, TIM_OC2);
 
+	/* -- OC3 configuration -- */
+	/* Configure global mode of line 3. */
+	timer_disable_oc_clear(TIM8, TIM_OC3);
+	timer_enable_oc_preload(TIM8, TIM_OC3);
+	timer_set_oc_slow_mode(TIM8, TIM_OC3);
+	timer_set_oc_mode(TIM8, TIM_OC3, TIM_OCM_PWM1);
+	timer_set_oc_polarity_high(TIM8, TIM_OC3);
+	timer_set_oc_idle_state_set(TIM8, TIM_OC3);
+	/* Set the capture compare value for OC3 to max value -1 for max duty cycle/brightness. */
+	timer_set_oc_value(TIM8, TIM_OC3, 0xFFFF/2);
+	timer_enable_oc_output(TIM8, TIM_OC3);
+
+	/* -- OC4 configuration -- */
+	/* Configure global mode of line 4. */
+	timer_disable_oc_clear(TIM8, TIM_OC4);
+	timer_enable_oc_preload(TIM8, TIM_OC4);
+	timer_set_oc_slow_mode(TIM8, TIM_OC4);
+	timer_set_oc_mode(TIM8, TIM_OC4, TIM_OCM_PWM1);
+	timer_set_oc_polarity_high(TIM8, TIM_OC4);
+	timer_set_oc_idle_state_set(TIM8, TIM_OC4);
+	/* Set the capture compare value for OC4 to max value -1 for max duty cycle/brightness. */
+	timer_set_oc_value(TIM8, TIM_OC4, 0xFFFF/2);
+	timer_enable_oc_output(TIM8, TIM_OC4);
+
 
 	timer_enable_preload(TIM8);
 	timer_enable_break_main_output(TIM8);
@@ -253,87 +546,63 @@ static void tim_setup_1(void)
 
 }
 
-static void tim_setup_2(void)
-{
-	/* Reset TIM1 peripheral. */
-	timer_reset(TIM4);
-	/* Timer global mode:
-	* - No divider
-	* - Alignment edge
-	* - Direction up
-	*/
-	timer_set_mode(TIM4, TIM_CR1_CKD_CK_INT, TIM_CR1_CMS_EDGE, TIM_CR1_DIR_UP);
-	timer_set_prescaler(TIM4, 0);
-	timer_set_repetition_counter(TIM4, 0);
-	/* Enable preload. */
-	timer_disable_preload(TIM4);
-	/* Continous mode. */
-	timer_continuous_mode(TIM4);
-	/* Period (36kHz). */
-	timer_set_period(TIM4, 0xFFFF);
-	/* Disable outputs. */
-	timer_disable_oc_output(TIM4, TIM_OC1);
-	timer_disable_oc_output(TIM4, TIM_OC2);
-	timer_disable_oc_output(TIM4, TIM_OC3);
-	timer_disable_oc_output(TIM4, TIM_OC4);
-
-	timer_set_deadtime(TIM4, 0);
-	timer_set_enabled_off_state_in_idle_mode(TIM4);
-	timer_set_enabled_off_state_in_run_mode(TIM4);
-	timer_disable_break(TIM4);
-	timer_set_break_polarity_high(TIM4);
-	timer_disable_break_automatic_output(TIM4);
-	timer_set_break_lock(TIM4, TIM_BDTR_LOCK_OFF);
-
-	/* -- OC1 configuration -- */
-	/* Configure global mode of line 1. */
-	timer_disable_oc_clear(TIM4, TIM_OC1);
-	timer_enable_oc_preload(TIM4, TIM_OC1);
-	timer_set_oc_slow_mode(TIM4, TIM_OC1);
-	timer_set_oc_mode(TIM4, TIM_OC1, TIM_OCM_PWM1);
-	timer_set_oc_polarity_high(TIM4, TIM_OC1);
-	timer_set_oc_idle_state_set(TIM4, TIM_OC1);
-	/* Set the capture compare value for OC1 to max value -1 for max duty cycle/brightness. */
-	timer_set_oc_value(TIM4, TIM_OC1, 0xFFFF/2);
-	timer_enable_oc_output(TIM4, TIM_OC1);
-	timer_enable_preload(TIM4);
-	timer_enable_break_main_output(TIM4);
-	/* Counter enable. */
-	timer_enable_counter(TIM4);
-
+int tim_setup() {
+	tim_setup_01()
+	tim_setup_02()
+	tim_setup_03()
+	tim_setup_04()
+	tim_setup_08()
 }
 
 
 int main(void)
 {
-	int i, j0, d0;
+	int i, j0, d0, k;
 
 	button_boot();
 
 	clock_setup();
 	gpio_setup();
 	tim_setup();
-	tim_setup_1();
-	tim_setup_2();
 
 	j0 = 0;
 	d0 = 1;
+	k = 0;
 	while (1) {
 		/* Set the timer compare value to the on time based on the gamma table.
 		 * Using the inverse of the gamma table, because the LED on the 1Bitsy
 		 * is on when the PWM signal is low.
 		 */
-		timer_set_oc_value(TIM1, TIM_OC1, 65535-gamma_table[j0]);
-		timer_set_oc_value(TIM4, TIM_OC1, 65535-gamma_table[j0]);
-		timer_set_oc_value(TIM8, TIM_OC1, 65535-gamma_table[j0]);
-		timer_set_oc_value(TIM8, TIM_OC2, gamma_table[j0]);
+		if ( k ==  0 ) timer_set_oc_value(TIM1, TIM_OC1, gamma_table[j0]);
+		if ( k ==  1 ) timer_set_oc_value(TIM1, TIM_OC2, gamma_table[j0]);
+		if ( k ==  2 ) timer_set_oc_value(TIM1, TIM_OC3, gamma_table[j0]);
+		if ( k ==  3 ) timer_set_oc_value(TIM1, TIM_OC4, gamma_table[j0]);
+		if ( k ==  4 ) timer_set_oc_value(TIM2, TIM_OC3, gamma_table[j0]);
+		if ( k ==  5 ) timer_set_oc_value(TIM2, TIM_OC4, gamma_table[j0]);
+		if ( k ==  6 ) timer_set_oc_value(TIM3, TIM_OC1, gamma_table[j0]);
+		if ( k ==  7 ) timer_set_oc_value(TIM3, TIM_OC2, gamma_table[j0]);
+		if ( k ==  8 ) timer_set_oc_value(TIM4, TIM_OC1, gamma_table[j0]);
+		if ( k ==  9 ) timer_set_oc_value(TIM4, TIM_OC2, gamma_table[j0]);
+		if ( k == 10 ) timer_set_oc_value(TIM4, TIM_OC3, gamma_table[j0]);
+		if ( k == 11 ) timer_set_oc_value(TIM4, TIM_OC4, gamma_table[j0]);
+		if ( k == 12 ) timer_set_oc_value(TIM8, TIM_OC1, gamma_table[j0]);
+		if ( k == 13 ) timer_set_oc_value(TIM8, TIM_OC2, gamma_table[j0]);
+		if ( k == 14 ) timer_set_oc_value(TIM8, TIM_OC3, gamma_table[j0]);
+		if ( k == 15 ) timer_set_oc_value(TIM8, TIM_OC4, gamma_table[j0]);
 
 		/* Progress through the gamma table index up and down. */
 		j0 += d0;
-		if (j0 == 255)
+		if (j0 == 255) {
 			d0 = -1;
-		if (j0 == 0)
+		}
+		if (j0 == 0) {
 			d0 = 1;
+			k += 1
+		}
+
+		if ( k == 16) {
+			k = 0;
+		}
 
 		/* Wait a little bit. */
 		for (i = 0; i < 100000; i++) asm("nop");
