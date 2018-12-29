@@ -17,11 +17,14 @@
 ## along with this library.  If not, see <http://www.gnu.org/licenses/>.
 ##
 
-OBJS = lib/common/button_boot.o
+OBJS = lib/common/button_boot.o src/adc.o src/uart.o src/rdimon_handler.o src/gpio.o 
 
 BINARY = src/main
 
 LDSCRIPT = lib/stm32f4-1bitsy.ld
+
+LDFLAGS         += --specs=rdimon.specs
+LDLIBS          += -lrdimon
 
 #include Makefile.include 
 ##

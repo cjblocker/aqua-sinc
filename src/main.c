@@ -1,9 +1,255 @@
 
 #include "../lib/common/button_boot.h"
+#include "adc.h"
+#include "uart.h"
 
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>
+#include <libopencm3/stm32/adc.h>
 #include <libopencm3/stm32/timer.h>
+#include <libopencm3/cm3/scs.h>
+#include <stdint.h>
+#include <stdio.h>
+
+static const adc_channel temp0 = { // PA0, ADC1 channel 0
+    .adc_adc = ADC1,
+    .adc_channel = 0,
+    .adc_gpio = {
+        .gp_port   = GPIOA,
+        .gp_pin    = GPIO0,
+        .gp_mode   = GPIO_MODE_ANALOG,
+        .gp_pupd   = GPIO_PUPD_NONE,
+        .gp_af     = 0,
+        .gp_ospeed = GPIO_OSPEED_DEFAULT,
+        .gp_otype  = GPIO_OTYPE_DEFAULT,
+        .gp_level  = 0,
+    },
+};
+
+static const adc_channel temp1 = { // PA1, ADC1 channel 1
+    .adc_adc = ADC1,
+    .adc_channel = 1,
+    .adc_gpio = {
+        .gp_port   = GPIOA,
+        .gp_pin    = GPIO1,
+        .gp_mode   = GPIO_MODE_ANALOG,
+        .gp_pupd   = GPIO_PUPD_NONE,
+        .gp_af     = 0,
+        .gp_ospeed = GPIO_OSPEED_DEFAULT,
+        .gp_otype  = GPIO_OTYPE_DEFAULT,
+        .gp_level  = 0,
+    },
+};
+
+static const adc_channel temp2 = { // PA2, ADC1 channel 2
+    .adc_adc = ADC1,
+    .adc_channel = 2,
+    .adc_gpio = {
+        .gp_port   = GPIOA,
+        .gp_pin    = GPIO2,
+        .gp_mode   = GPIO_MODE_ANALOG,
+        .gp_pupd   = GPIO_PUPD_NONE,
+        .gp_af     = 0,
+        .gp_ospeed = GPIO_OSPEED_DEFAULT,
+        .gp_otype  = GPIO_OTYPE_DEFAULT,
+        .gp_level  = 0,
+    },
+};
+
+static const adc_channel temp3 = { // PA3, ADC1 channel 3
+    .adc_adc = ADC1,
+    .adc_channel = 3,
+    .adc_gpio = {
+        .gp_port   = GPIOA,
+        .gp_pin    = GPIO3,
+        .gp_mode   = GPIO_MODE_ANALOG,
+        .gp_pupd   = GPIO_PUPD_NONE,
+        .gp_af     = 0,
+        .gp_ospeed = GPIO_OSPEED_DEFAULT,
+        .gp_otype  = GPIO_OTYPE_DEFAULT,
+        .gp_level  = 0,
+    },
+};
+
+static const adc_channel temp4 = { // PA4, ADC1 channel 4
+    .adc_adc = ADC1,
+    .adc_channel = 4,
+    .adc_gpio = {
+        .gp_port   = GPIOA,
+        .gp_pin    = GPIO4,
+        .gp_mode   = GPIO_MODE_ANALOG,
+        .gp_pupd   = GPIO_PUPD_NONE,
+        .gp_af     = 0,
+        .gp_ospeed = GPIO_OSPEED_DEFAULT,
+        .gp_otype  = GPIO_OTYPE_DEFAULT,
+        .gp_level  = 0,
+    },
+};
+
+static const adc_channel temp5 = { // PA5, ADC1 channel 5
+    .adc_adc = ADC1,
+    .adc_channel = 5,
+    .adc_gpio = {
+        .gp_port   = GPIOA,
+        .gp_pin    = GPIO5,
+        .gp_mode   = GPIO_MODE_ANALOG,
+        .gp_pupd   = GPIO_PUPD_NONE,
+        .gp_af     = 0,
+        .gp_ospeed = GPIO_OSPEED_DEFAULT,
+        .gp_otype  = GPIO_OTYPE_DEFAULT,
+        .gp_level  = 0,
+    },
+};
+
+static const adc_channel temp6 = { // PA6, ADC1 channel 6
+    .adc_adc = ADC1,
+    .adc_channel = 6,
+    .adc_gpio = {
+        .gp_port   = GPIOA,
+        .gp_pin    = GPIO6,
+        .gp_mode   = GPIO_MODE_ANALOG,
+        .gp_pupd   = GPIO_PUPD_NONE,
+        .gp_af     = 0,
+        .gp_ospeed = GPIO_OSPEED_DEFAULT,
+        .gp_otype  = GPIO_OTYPE_DEFAULT,
+        .gp_level  = 0,
+    },
+};
+
+static const adc_channel temp7 = { // PA7, ADC1 channel 7
+    .adc_adc = ADC1,
+    .adc_channel = 7,
+    .adc_gpio = {
+        .gp_port   = GPIOA,
+        .gp_pin    = GPIO7,
+        .gp_mode   = GPIO_MODE_ANALOG,
+        .gp_pupd   = GPIO_PUPD_NONE,
+        .gp_af     = 0,
+        .gp_ospeed = GPIO_OSPEED_DEFAULT,
+        .gp_otype  = GPIO_OTYPE_DEFAULT,
+        .gp_level  = 0,
+    },
+};
+
+static const adc_channel temp8 = { // PB0, ADC1 channel 8
+    .adc_adc = ADC1,
+    .adc_channel = 8,
+    .adc_gpio = {
+        .gp_port   = GPIOB,
+        .gp_pin    = GPIO0,
+        .gp_mode   = GPIO_MODE_ANALOG,
+        .gp_pupd   = GPIO_PUPD_NONE,
+        .gp_af     = 0,
+        .gp_ospeed = GPIO_OSPEED_DEFAULT,
+        .gp_otype  = GPIO_OTYPE_DEFAULT,
+        .gp_level  = 0,
+    },
+};
+
+static const adc_channel temp9 = { // PB1, ADC1 channel 9
+    .adc_adc = ADC1,
+    .adc_channel = 9,
+    .adc_gpio = {
+        .gp_port   = GPIOB,
+        .gp_pin    = GPIO1,
+        .gp_mode   = GPIO_MODE_ANALOG,
+        .gp_pupd   = GPIO_PUPD_NONE,
+        .gp_af     = 0,
+        .gp_ospeed = GPIO_OSPEED_DEFAULT,
+        .gp_otype  = GPIO_OTYPE_DEFAULT,
+        .gp_level  = 0,
+    },
+};
+
+static const adc_channel temp10 = { // PC0, ADC1 channel 10
+    .adc_adc = ADC1,
+    .adc_channel = 10,
+    .adc_gpio = {
+        .gp_port   = GPIOC,
+        .gp_pin    = GPIO0,
+        .gp_mode   = GPIO_MODE_ANALOG,
+        .gp_pupd   = GPIO_PUPD_NONE,
+        .gp_af     = 0,
+        .gp_ospeed = GPIO_OSPEED_DEFAULT,
+        .gp_otype  = GPIO_OTYPE_DEFAULT,
+        .gp_level  = 0,
+    },
+};
+
+static const adc_channel temp11 = { // PC1, ADC1 channel 11
+    .adc_adc = ADC1,
+    .adc_channel = 11,
+    .adc_gpio = {
+        .gp_port   = GPIOC,
+        .gp_pin    = GPIO1,
+        .gp_mode   = GPIO_MODE_ANALOG,
+        .gp_pupd   = GPIO_PUPD_NONE,
+        .gp_af     = 0,
+        .gp_ospeed = GPIO_OSPEED_DEFAULT,
+        .gp_otype  = GPIO_OTYPE_DEFAULT,
+        .gp_level  = 0,
+    },
+};
+
+static const adc_channel temp12 = { // PC2, ADC1 channel 12
+    .adc_adc = ADC1,
+    .adc_channel = 12,
+    .adc_gpio = {
+        .gp_port   = GPIOC,
+        .gp_pin    = GPIO2,
+        .gp_mode   = GPIO_MODE_ANALOG,
+        .gp_pupd   = GPIO_PUPD_NONE,
+        .gp_af     = 0,
+        .gp_ospeed = GPIO_OSPEED_DEFAULT,
+        .gp_otype  = GPIO_OTYPE_DEFAULT,
+        .gp_level  = 0,
+    },
+};
+
+static const adc_channel temp13 = { // PC3, ADC1 channel 13
+    .adc_adc = ADC1,
+    .adc_channel = 13,
+    .adc_gpio = {
+        .gp_port   = GPIOC,
+        .gp_pin    = GPIO3,
+        .gp_mode   = GPIO_MODE_ANALOG,
+        .gp_pupd   = GPIO_PUPD_NONE,
+        .gp_af     = 0,
+        .gp_ospeed = GPIO_OSPEED_DEFAULT,
+        .gp_otype  = GPIO_OTYPE_DEFAULT,
+        .gp_level  = 0,
+    },
+};
+
+static const adc_channel temp14 = { // PC4, ADC1 channel 14
+    .adc_adc = ADC1,
+    .adc_channel = 14,
+    .adc_gpio = {
+        .gp_port   = GPIOC,
+        .gp_pin    = GPIO4,
+        .gp_mode   = GPIO_MODE_ANALOG,
+        .gp_pupd   = GPIO_PUPD_NONE,
+        .gp_af     = 0,
+        .gp_ospeed = GPIO_OSPEED_DEFAULT,
+        .gp_otype  = GPIO_OTYPE_DEFAULT,
+        .gp_level  = 0,
+    },
+};
+
+static const adc_channel temp15 = { // PC5, ADC1 channel 15
+    .adc_adc = ADC1,
+    .adc_channel = 15,
+    .adc_gpio = {
+        .gp_port   = GPIOC,
+        .gp_pin    = GPIO5,
+        .gp_mode   = GPIO_MODE_ANALOG,
+        .gp_pupd   = GPIO_PUPD_NONE,
+        .gp_af     = 0,
+        .gp_ospeed = GPIO_OSPEED_DEFAULT,
+        .gp_otype  = GPIO_OTYPE_DEFAULT,
+        .gp_level  = 0,
+    },
+};
 
 /*
  * Gamma correction table
@@ -12,8 +258,8 @@
  * Iout = Iin ** gamma
  */
 static const uint16_t gamma_table[] = {
-	0,	0,	2,	4,	7,	11,	17,	24,
-	32,	42,	53,	65,	79,	94,	111,	129,
+	0,		0,		2,		4,		7,		11,		17,		24,
+	32,		42,		53,		65,		79,		94,		111,	129,
 	148,	169,	192,	216,	242,	270,	299,	330,
 	362,	396,	432,	469,	508,	549,	591,	635,
 	681,	729,	779,	830,	883,	938,	995,	1053,
@@ -182,7 +428,7 @@ static void tim_setup_01(void)
 	timer_set_oc_polarity_high(TIM1, TIM_OC1);
 	timer_set_oc_idle_state_set(TIM1, TIM_OC1);
 	/* Set the capture compare value for OC1 to max value -1 for max duty cycle/brightness. */
-	timer_set_oc_value(TIM1, TIM_OC1, 0xFFFF/2);
+	timer_set_oc_value(TIM1, TIM_OC1, 0xFFFF);
 	timer_enable_oc_output(TIM1, TIM_OC1);
 
 
@@ -195,7 +441,7 @@ static void tim_setup_01(void)
 	timer_set_oc_polarity_high(TIM1, TIM_OC2);
 	timer_set_oc_idle_state_set(TIM1, TIM_OC2);
 	/* Set the capture compare value for OC2 to max value -1 for max duty cycle/brightness. */
-	timer_set_oc_value(TIM1, TIM_OC2, 0xFFFF/2);
+	timer_set_oc_value(TIM1, TIM_OC2, 0xFFFF);
 	timer_enable_oc_output(TIM1, TIM_OC2);
 
 
@@ -208,7 +454,7 @@ static void tim_setup_01(void)
 	timer_set_oc_polarity_high(TIM1, TIM_OC3);
 	timer_set_oc_idle_state_set(TIM1, TIM_OC3);
 	/* Set the capture compare value for OC3 to max value -1 for max duty cycle/brightness. */
-	timer_set_oc_value(TIM1, TIM_OC3, 0xFFFF/2);
+	timer_set_oc_value(TIM1, TIM_OC3, 0xFFFF);
 	timer_enable_oc_output(TIM1, TIM_OC3);
 
 
@@ -221,7 +467,7 @@ static void tim_setup_01(void)
 	timer_set_oc_polarity_high(TIM1, TIM_OC4);
 	timer_set_oc_idle_state_set(TIM1, TIM_OC4);
 	/* Set the capture compare value for OC4 to max value -1 for max duty cycle/brightness. */
-	timer_set_oc_value(TIM1, TIM_OC4, 0xFFFF/2);
+	timer_set_oc_value(TIM1, TIM_OC4, 0xFFFF);
 	timer_enable_oc_output(TIM1, TIM_OC4);
 
 
@@ -278,7 +524,7 @@ static void tim_setup_02(void)
 	timer_set_oc_polarity_high(TIM2, TIM_OC3);
 	timer_set_oc_idle_state_set(TIM2, TIM_OC3);
 	/* Set the capture compare value for OC3 to max value -1 for max duty cycle/brightness. */
-	timer_set_oc_value(TIM2, TIM_OC3, 0xFFFF/2);
+	timer_set_oc_value(TIM2, TIM_OC3, 0xFFFF);
 	timer_enable_oc_output(TIM2, TIM_OC3);
 
 
@@ -291,7 +537,7 @@ static void tim_setup_02(void)
 	timer_set_oc_polarity_high(TIM2, TIM_OC4);
 	timer_set_oc_idle_state_set(TIM2, TIM_OC4);
 	/* Set the capture compare value for OC4 to max value -1 for max duty cycle/brightness. */
-	timer_set_oc_value(TIM2, TIM_OC4, 0xFFFF/2);
+	timer_set_oc_value(TIM2, TIM_OC4, 0xFFFF);
 	timer_enable_oc_output(TIM2, TIM_OC4);
 
 
@@ -345,7 +591,7 @@ static void tim_setup_03(void)
 	timer_set_oc_polarity_high(TIM3, TIM_OC1);
 	timer_set_oc_idle_state_set(TIM3, TIM_OC1);
 	/* Set the capture compare value for OC1 to max value -1 for max duty cycle/brightness. */
-	timer_set_oc_value(TIM3, TIM_OC1, 0xFFFF/2);
+	timer_set_oc_value(TIM3, TIM_OC1, 0xFFFF);
 	timer_enable_oc_output(TIM3, TIM_OC1);
 
 
@@ -358,7 +604,7 @@ static void tim_setup_03(void)
 	timer_set_oc_polarity_high(TIM3, TIM_OC2);
 	timer_set_oc_idle_state_set(TIM3, TIM_OC2);
 	/* Set the capture compare value for OC2 to max value -1 for max duty cycle/brightness. */
-	timer_set_oc_value(TIM3, TIM_OC2, 0xFFFF/2);
+	timer_set_oc_value(TIM3, TIM_OC2, 0xFFFF);
 	timer_enable_oc_output(TIM3, TIM_OC2);
 
 
@@ -411,7 +657,7 @@ static void tim_setup_04(void)
 	timer_set_oc_polarity_high(TIM4, TIM_OC1);
 	timer_set_oc_idle_state_set(TIM4, TIM_OC1);
 	/* Set the capture compare value for OC1 to max value -1 for max duty cycle/brightness. */
-	timer_set_oc_value(TIM4, TIM_OC1, 0xFFFF/2);
+	timer_set_oc_value(TIM4, TIM_OC1, 0xFFFF);
 	timer_enable_oc_output(TIM4, TIM_OC1);
 
 	/* -- OC2 configuration -- */
@@ -423,7 +669,7 @@ static void tim_setup_04(void)
 	timer_set_oc_polarity_high(TIM4, TIM_OC2);
 	timer_set_oc_idle_state_set(TIM4, TIM_OC2);
 	/* Set the capture compare value for OC2 to max value -1 for max duty cycle/brightness. */
-	timer_set_oc_value(TIM4, TIM_OC2, 0xFFFF/2);
+	timer_set_oc_value(TIM4, TIM_OC2, 0xFFFF);
 	timer_enable_oc_output(TIM4, TIM_OC2);
 
 	/* -- OC3 configuration -- */
@@ -435,7 +681,7 @@ static void tim_setup_04(void)
 	timer_set_oc_polarity_high(TIM4, TIM_OC3);
 	timer_set_oc_idle_state_set(TIM4, TIM_OC3);
 	/* Set the capture compare value for OC3 to max value -1 for max duty cycle/brightness. */
-	timer_set_oc_value(TIM4, TIM_OC3, 0xFFFF/2);
+	timer_set_oc_value(TIM4, TIM_OC3, 0xFFFF);
 	timer_enable_oc_output(TIM4, TIM_OC3);
 
 	/* -- OC4 configuration -- */
@@ -447,7 +693,7 @@ static void tim_setup_04(void)
 	timer_set_oc_polarity_high(TIM4, TIM_OC4);
 	timer_set_oc_idle_state_set(TIM4, TIM_OC4);
 	/* Set the capture compare value for OC4 to max value -1 for max duty cycle/brightness. */
-	timer_set_oc_value(TIM4, TIM_OC4, 0xFFFF/2);
+	timer_set_oc_value(TIM4, TIM_OC4, 0xFFFF);
 	timer_enable_oc_output(TIM4, TIM_OC4);
 
 
@@ -499,7 +745,7 @@ static void tim_setup_08(void)
 	timer_set_oc_polarity_high(TIM8, TIM_OC1);
 	timer_set_oc_idle_state_set(TIM8, TIM_OC1);
 	/* Set the capture compare value for OC1 to max value -1 for max duty cycle/brightness. */
-	timer_set_oc_value(TIM8, TIM_OC1, 0xFFFF/2);
+	timer_set_oc_value(TIM8, TIM_OC1, 0xFFFF);
 	timer_enable_oc_output(TIM8, TIM_OC1);
 
 	/* -- OC2 configuration -- */
@@ -511,7 +757,7 @@ static void tim_setup_08(void)
 	timer_set_oc_polarity_high(TIM8, TIM_OC2);
 	timer_set_oc_idle_state_set(TIM8, TIM_OC2);
 	/* Set the capture compare value for OC2 to max value -1 for max duty cycle/brightness. */
-	timer_set_oc_value(TIM8, TIM_OC2, 0xFFFF/2);
+	timer_set_oc_value(TIM8, TIM_OC2, 0xFFFF);
 	timer_enable_oc_output(TIM8, TIM_OC2);
 
 	/* -- OC3 configuration -- */
@@ -523,7 +769,7 @@ static void tim_setup_08(void)
 	timer_set_oc_polarity_high(TIM8, TIM_OC3);
 	timer_set_oc_idle_state_set(TIM8, TIM_OC3);
 	/* Set the capture compare value for OC3 to max value -1 for max duty cycle/brightness. */
-	timer_set_oc_value(TIM8, TIM_OC3, 0xFFFF/2);
+	timer_set_oc_value(TIM8, TIM_OC3, 0xFFFF);
 	timer_enable_oc_output(TIM8, TIM_OC3);
 
 	/* -- OC4 configuration -- */
@@ -535,7 +781,7 @@ static void tim_setup_08(void)
 	timer_set_oc_polarity_high(TIM8, TIM_OC4);
 	timer_set_oc_idle_state_set(TIM8, TIM_OC4);
 	/* Set the capture compare value for OC4 to max value -1 for max duty cycle/brightness. */
-	timer_set_oc_value(TIM8, TIM_OC4, 0xFFFF/2);
+	timer_set_oc_value(TIM8, TIM_OC4, 0xFFFF);
 	timer_enable_oc_output(TIM8, TIM_OC4);
 
 
@@ -546,24 +792,52 @@ static void tim_setup_08(void)
 
 }
 
-int tim_setup() {
-	tim_setup_01()
-	tim_setup_02()
-	tim_setup_03()
-	tim_setup_04()
-	tim_setup_08()
+static void tim_setup(void) {
+	tim_setup_01();
+	tim_setup_02();
+	tim_setup_03();
+	tim_setup_04();
+	tim_setup_08();
 }
 
+static void adc_setup(void) {
+	init_adc_channel(&temp0);
+	init_adc_channel(&temp1);
+	init_adc_channel(&temp2);
+	init_adc_channel(&temp3);
+	init_adc_channel(&temp4);
+	init_adc_channel(&temp5);
+	init_adc_channel(&temp6);
+	init_adc_channel(&temp7);
+	init_adc_channel(&temp8);
+	init_adc_channel(&temp9);
+	init_adc_channel(&temp10);
+	init_adc_channel(&temp11);
+	init_adc_channel(&temp12);
+	init_adc_channel(&temp13);
+	init_adc_channel(&temp14);
+	init_adc_channel(&temp15);
+}
+
+
+extern void initialise_monitor_handles(void);
 
 int main(void)
 {
 	int i, j0, d0, k;
+	volatile uint16_t t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15;
 
 	button_boot();
 
 	clock_setup();
 	gpio_setup();
 	tim_setup();
+	adc_setup();
+	uart_init();
+
+	/* Enable and initialise the debug monitor handler. */
+    SCS_DEMCR |= SCS_DEMCR_VC_MON_EN;
+	initialise_monitor_handles();
 
 	j0 = 0;
 	d0 = 1;
@@ -573,22 +847,22 @@ int main(void)
 		 * Using the inverse of the gamma table, because the LED on the 1Bitsy
 		 * is on when the PWM signal is low.
 		 */
-		if ( k ==  0 ) timer_set_oc_value(TIM1, TIM_OC1, gamma_table[j0]);
-		if ( k ==  1 ) timer_set_oc_value(TIM1, TIM_OC2, gamma_table[j0]);
-		if ( k ==  2 ) timer_set_oc_value(TIM1, TIM_OC3, gamma_table[j0]);
-		if ( k ==  3 ) timer_set_oc_value(TIM1, TIM_OC4, gamma_table[j0]);
-		if ( k ==  4 ) timer_set_oc_value(TIM2, TIM_OC3, gamma_table[j0]);
-		if ( k ==  5 ) timer_set_oc_value(TIM2, TIM_OC4, gamma_table[j0]);
-		if ( k ==  6 ) timer_set_oc_value(TIM3, TIM_OC1, gamma_table[j0]);
-		if ( k ==  7 ) timer_set_oc_value(TIM3, TIM_OC2, gamma_table[j0]);
-		if ( k ==  8 ) timer_set_oc_value(TIM4, TIM_OC1, gamma_table[j0]);
-		if ( k ==  9 ) timer_set_oc_value(TIM4, TIM_OC2, gamma_table[j0]);
-		if ( k == 10 ) timer_set_oc_value(TIM4, TIM_OC3, gamma_table[j0]);
-		if ( k == 11 ) timer_set_oc_value(TIM4, TIM_OC4, gamma_table[j0]);
-		if ( k == 12 ) timer_set_oc_value(TIM8, TIM_OC1, gamma_table[j0]);
-		if ( k == 13 ) timer_set_oc_value(TIM8, TIM_OC2, gamma_table[j0]);
-		if ( k == 14 ) timer_set_oc_value(TIM8, TIM_OC3, gamma_table[j0]);
-		if ( k == 15 ) timer_set_oc_value(TIM8, TIM_OC4, gamma_table[j0]);
+		if ( k ==  0 ) timer_set_oc_value(TIM1, TIM_OC1, 65535 - gamma_table[j0]);
+		if ( k ==  1 ) timer_set_oc_value(TIM1, TIM_OC2, 65535 - gamma_table[j0]);
+		if ( k ==  2 ) timer_set_oc_value(TIM1, TIM_OC3, 65535 - gamma_table[j0]);
+		if ( k ==  3 ) timer_set_oc_value(TIM1, TIM_OC4, 65535 - gamma_table[j0]);
+		if ( k ==  4 ) timer_set_oc_value(TIM2, TIM_OC3, 65535 - gamma_table[j0]);
+		if ( k ==  5 ) timer_set_oc_value(TIM2, TIM_OC4, 65535 - gamma_table[j0]);
+		if ( k ==  6 ) timer_set_oc_value(TIM3, TIM_OC1, 65535 - gamma_table[j0]);
+		if ( k ==  7 ) timer_set_oc_value(TIM3, TIM_OC2, 65535 - gamma_table[j0]);
+		if ( k ==  8 ) timer_set_oc_value(TIM4, TIM_OC1, 65535 - gamma_table[j0]);
+		if ( k ==  9 ) timer_set_oc_value(TIM4, TIM_OC2, 65535 - gamma_table[j0]);
+		if ( k == 10 ) timer_set_oc_value(TIM4, TIM_OC3, 65535 - gamma_table[j0]);
+		if ( k == 11 ) timer_set_oc_value(TIM4, TIM_OC4, 65535 - gamma_table[j0]);
+		if ( k == 12 ) timer_set_oc_value(TIM8, TIM_OC1, 65535 - gamma_table[j0]);
+		if ( k == 13 ) timer_set_oc_value(TIM8, TIM_OC2, 65535 - gamma_table[j0]);
+		if ( k == 14 ) timer_set_oc_value(TIM8, TIM_OC3, 65535 - gamma_table[j0]);
+		if ( k == 15 ) timer_set_oc_value(TIM8, TIM_OC4, 65535 - gamma_table[j0]);
 
 		/* Progress through the gamma table index up and down. */
 		j0 += d0;
@@ -597,7 +871,25 @@ int main(void)
 		}
 		if (j0 == 0) {
 			d0 = 1;
-			k += 1
+			k += 1;
+			printf("%d\n\r", k);
+
+			t0  = adc_read_single( &temp0  );
+			t1  = adc_read_single( &temp1  );
+			t2  = adc_read_single( &temp2  );
+			t3  = adc_read_single( &temp3  );
+			t4  = adc_read_single( &temp4  );
+			t5  = adc_read_single( &temp5  );
+			t6  = adc_read_single( &temp6  );
+			t7  = adc_read_single( &temp7  );
+			t8  = adc_read_single( &temp8  );
+			t9  = adc_read_single( &temp9  );
+			t10 = adc_read_single( &temp10 );
+			t11 = adc_read_single( &temp11 );
+			t12 = adc_read_single( &temp12 );
+			t13 = adc_read_single( &temp13 );
+			t14 = adc_read_single( &temp14 );
+			t15 = adc_read_single( &temp15 );
 		}
 
 		if ( k == 16) {
@@ -605,7 +897,7 @@ int main(void)
 		}
 
 		/* Wait a little bit. */
-		for (i = 0; i < 100000; i++) asm("nop");
+		for (i = 0; i < 10000; i++) asm("nop");
 
 	}
 
