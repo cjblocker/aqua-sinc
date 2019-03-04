@@ -8,3 +8,7 @@ src/*.list
 src/*.map
 
 .DS_Store
+
+ref/*.pdf
+release/*.zip
+hw/eagle.epf
