@@ -5,5 +5,5 @@ set confirm off
 set mem inaccessible-by-default off
 target extended-remote /dev/cu.usbmodem7BAB88A81
 monitor version
-monitor jtag_scan
+monitor swdp_scan
 attach 1

@@ -279,6 +279,9 @@ clean:
 	@printf "  CLEAN\n"
 	$(Q)$(RM) src/*.o src/*.d src/*.elf src/*.bin src/*.hex src/*.srec src/*.list src/*.map
 
+debug: $(BINARY).elf
+	arm-none-eabi-gdb $(BINARY).elf
+
 stylecheck: $(STYLECHECKFILES:=.stylecheck)
 styleclean: $(STYLECHECKFILES:=.styleclean)
 
